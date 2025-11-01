@@ -97,21 +97,30 @@ const Navigation = () => {
           {userInfo ? (
             <span className="text-white">{userInfo.username}</span>
           ) : (
-            <></>
+            <>
+            </>
           )}
+          {userInfo && (
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 ml-1 ${dropdownOpen ? "rotate-180" : ""}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="white"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d={dropdownOpen ? "M19 9l-7 7-7-7" : "M5 15l7-7 7 7"}
+                  />
+                </svg>
+              )}
         </button>
 
         {dropdownOpen && userInfo && (
-          <ul className="absolute bottom-0 left-0 bg-gray-900 text-white rounded shadow-md mt-2 p-2 space-y-2">
-            <li>
-              <button
-                onClick={logOutHandler}
-                className="w-full text-left hover:text-red-400"
-              >
-                Logout
-              </button>
-            </li>
-          </ul>
+          <ul className="{`absolute right-0 mt-2  mr-14 space-y-2 bg-white text-gray-600 
+        ${!userInfo}`}"></ul>
         )}
       </div>
 
