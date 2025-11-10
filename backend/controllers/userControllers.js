@@ -61,6 +61,8 @@ const loginUser = asyncHandler(async(req,res)=>{
        return;
     }
    }
+    res.status(401);
+    throw new Error("invalid email or password")
 })
 
 const logoutCurrentUser = asyncHandler(async(req,res)=>{
@@ -78,7 +80,7 @@ const getAllUsers = asyncHandler(async(req,res)=>{
 });
 
 const getCurrentUserProfile = asyncHandler(async(req,res)=>{
-  const user = await User.findById(req.User._id);
+  const user = await User.findById(req.user._id);
   if(user){
     res.json({
       _id:user._id,
@@ -93,7 +95,7 @@ const getCurrentUserProfile = asyncHandler(async(req,res)=>{
 })
 
 const updateCurrentUserProfile = asyncHandler(async(req,res)=>{
-  const user = await User.findById(req.User._id);
+  const user = await User.findById(req.user._id);
 
   if(user){
     user.username = req.body.username || user.username;
@@ -121,6 +123,8 @@ const updateCurrentUserProfile = asyncHandler(async(req,res)=>{
     
   }
 })
+
+
 
 const deleteById = asyncHandler(async(req,res)=>{
   const user = await User.findById(req.params.id);

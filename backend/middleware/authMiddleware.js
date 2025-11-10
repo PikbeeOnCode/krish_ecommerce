@@ -14,7 +14,7 @@ const authenticate = asynchandler(async(req,res,next)=>{
      if(token){
         try{
             const decoded = jwt.verify(token,process.env.JWT_SECRET);
-            req.User = await User.findById(decoded.userId).select('-password');
+            req.user = await User.findById(decoded.userId).select('-password');
             next();
         }catch(error){
             res.status(401);
@@ -27,7 +27,7 @@ const authenticate = asynchandler(async(req,res,next)=>{
 })
 
 const authorizationAdmin = (req,res,next)=>{
-    if(req.User && req.User.isAdmin){
+    if(req.user && req.user.isAdmin){
         next();
     }else{
         res.status(401).send('not authoriezed as admin');

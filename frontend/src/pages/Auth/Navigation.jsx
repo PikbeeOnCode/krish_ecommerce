@@ -118,10 +118,77 @@ const Navigation = () => {
               )}
         </button>
 
-        {dropdownOpen && userInfo && (
-          <ul className="{`absolute right-0 mt-2  mr-14 space-y-2 bg-white text-gray-600 
-        ${!userInfo}`}"></ul>
-        )}
+       {dropdownOpen && userInfo && (
+  <ul
+    className={`absolute right-0 mt-2 mr-14 space-y-2 bg-white text-gray-600 
+      ${!userInfo.isAdmin ? "-top-20" : "-top-80"}`}
+  >
+    <>
+      {userInfo.isAdmin ? (
+        <>
+          <li>
+            <Link
+              to="/admin/dashboard"
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              Dashboard
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/admin/productLists"
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              Products
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/admin/categoryLists"
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              Category
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/admin/orderlist"
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              Orders
+            </Link>
+          </li>
+          <li>
+            <Link
+              to="/admin/userlist"
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              userList
+            </Link>
+          </li>
+        </>
+      ) : null}
+
+      {/* Common for both admin and non-admin */}
+      <li>
+        <Link
+          to="/profile"
+          className="block px-4 py-2 hover:bg-gray-100"
+        >
+          Profile
+        </Link>
+      </li>
+      <li>
+       <button
+        onClick={logOutHandler}
+        className="block px-4 py-2 hover:bg-gray-100">
+           Logout
+       </button>
+      </li>
+    </>
+  </ul>
+)}
+
       </div>
 
       {/* ----------- Auth Links ----------- */}
