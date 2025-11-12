@@ -8,6 +8,8 @@ const categorySchema = new mongoose.Schema({
         trim:true,
         maxLength:32,
     }
+},{
+    timestamps:true
 })
 
 export default mongoose.model('Category',categorySchema);
