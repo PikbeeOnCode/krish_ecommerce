@@ -166,6 +166,14 @@ const Navigation = () => {
               userList
             </Link>
           </li>
+           <li>
+            <Link
+              to="/admin/categorylist"
+              className="block px-4 py-2 hover:bg-gray-100"
+            >
+              categorylist
+            </Link>
+          </li>
         </>
       ) : null}
 
