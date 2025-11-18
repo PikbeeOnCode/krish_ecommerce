@@ -8,6 +8,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";  // added .js here
 import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
+import productRoutes from "./routes/productRoutes.js";
 dotenv.config();
 const PORT = process.env.PORT || 3000;
 
@@ -21,6 +22,7 @@ app.use(cookieParser());
 
 app.use('/api/users',userRoutes);
 app.use('/api/category',categoryRoutes);
+app.use('/api/Products',productRoutes);
 
 app.listen(PORT, () => {
   console.log("Port 3000 is listening!");
