@@ -13,14 +13,23 @@ import
  { addProduct,
     updateProductDetails,
     removeProduct,
+    fetchProducts,
+    fetchProductById,
     fetchAllProducts,
-    fetchProductById
+    addProductReview,
+    fetchTopProducts,
+    fetchNewProducts
  } from "../controllers/productController.js";
 
 router
 .route('/')
-.get(fetchAllProducts)
+.get(fetchProducts)
 .post(authenticate,authorizationAdmin,formidable(),addProduct);
+
+router.route('/allproducts').get(fetchAllProducts);
+router.route('/:id/reviews').post(authenticate,authorizationAdmin,checkId,addProductReview);
+router.route('/top').get(fetchTopProducts);
+router.route('/new').get(fetchNewProducts)
 
 
 router

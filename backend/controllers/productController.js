@@ -96,7 +96,7 @@ const removeProduct = asyncHandler(async(req,res)=>{
     }
 });
 
-const fetchAllProducts = asyncHandler(async (req, res) => {
+const fetchProducts = asyncHandler(async (req, res) => {
     const pages = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (pages - 1) * limit;
@@ -131,12 +131,73 @@ const fetchProductById = asyncHandler(async(req,res)=>{
     }return res.status(200).json(product);
 })
 
+const fetchAllProducts = asyncHandler(async(req,res)=>{
+    const products = await Product.find({}).populate('category').sort({createdAt:-1}).limit(12);
+    if(products.length === 0){
+        return res.status(404).json({message:"No products found" });
+    }
+
+    return res.status(200).json(products);
+})
   
 
+const addProductReview = asyncHandler(async(req,res)=>{
+    const {rating,comment} = req.body;
+    const product = await Product.findById(req.params.id);
+    if(product){
+        const alreadyReviewed = product.reviews.find(r=>r.user.toString()===req.user._id.toString());
+        if(alreadyReviewed){
+            return res.status(400).json({message:"Product already reviewed"});
+        }
+        console.log("User in req:", req.user);
+
+        const review = {
+            name : req.user.username,
+            rating: Number(rating),
+            comment,
+            user: req.user._id
+        }
+
+        product.reviews.push(review);
+        product.numReviews = product.reviews.length;
+        product.rating = product.reviews.reduce((acc,item)=>item.rating + acc,0) / product.reviews.length;
+
+        await product.save();
+        console.log("Review added successfully");
+        res.status(201).json({message:"Review added"});
+    }else{
+        res.status(404).json({message:"Product not found"});
+        console.log("Product not found");
+        throw new Error("Product not found");
+        
+    }
+})
+
+const fetchTopProducts = asyncHandler(async(req,res)=>{
+    const products = await Product.find({}).sort({ratings:-1}).limit(4);
+    if(products.length === 0){
+        return res.status(404).json({message:"No products found" });
+    }
+    res.json(products);
+});
+
+const fetchNewProducts = asyncHandler(async(req,res)=>{
+    const products = await Product.find({}).sort({createdAt:-1}).limit(4);
+    if(products.length === 0){
+        return res.status(404).json({message:"No products found" });
+    }
+
+    res.json(products);
+})
+
 export
- {addProduct,
+{addProduct,
 updateProductDetails,
 removeProduct,
+fetchProducts,
+fetchProductById,
 fetchAllProducts,
-fetchProductById
+addProductReview,
+fetchTopProducts,
+fetchNewProducts
  };
