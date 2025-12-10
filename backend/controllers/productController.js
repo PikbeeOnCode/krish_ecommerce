@@ -6,8 +6,10 @@ import mongoose from "mongoose";
 
 const addProduct = asyncHandler(async(req,res)=>{
     try {
+        console.log('req.fields:', req.fields); // Your form data
+        console.log('req.files:', req.files); 
+       // ✅ CORRECT
         const { title, author, category, genre, summary, publishedDate, language, price, countInStock, coverImage } = req.fields;
-        
         switch (true) {
             case !title:
                 return res.status(400).json({ message: "Title is required" });
@@ -30,8 +32,7 @@ const addProduct = asyncHandler(async(req,res)=>{
             case !coverImage:
                 return res.status(400).json({ message: "Cover Image is required" });    
         }
-
-        const product = new Product({...req.fields});
+        const product = new Product({ ...req.fields });
         await product.save();
         res.status(201).json({ message: "Product added successfully", product });
     } catch (error) {
@@ -97,9 +98,9 @@ const removeProduct = asyncHandler(async(req,res)=>{
 });
 
 const fetchProducts = asyncHandler(async (req, res) => {
-    const pages = parseInt(req.query.page) || 1;
+    const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
-    const skip = (pages - 1) * limit;
+    const skip = (page - 1) * limit;
      const filter = {};
 
      if(req.query.search){
@@ -109,13 +110,13 @@ const fetchProducts = asyncHandler(async (req, res) => {
 
     const products =  await Product.find(filter).limit(limit).skip(skip).sort({createdAt:-1});
 
-    const totalproducts = await Product.countDocuments(filter);
+    const totalProducts = await Product.countDocuments(filter);
 
-    const totalPages = Math.ceil(totalproducts / limit);
+    const totalPages = Math.ceil(totalProducts / limit);
 
     if(products.length === 0){
         return res.status(404).json({message:"No products found" });
-    }return res.status(200).json({products,currentPage:pages,totalPages,totalproducts,hasnextPage:pages<totalPages,hasPrevPage:pages>1});
+    }return res.status(200).json({products,currentPage:pages,totalPages,totalProducts,hasnextPage:page<totalPages,hasPrevPage:pages>1});
 
 });
 
