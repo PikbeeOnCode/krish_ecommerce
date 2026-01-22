@@ -1,42 +1,45 @@
 import express from "express";
-import formidable from "express-formidable";
+import multer from "multer";
 const router = express.Router();
-// authentication
 
-import { authenticate,authorizationAdmin } from "../middleware/authMiddleware.js";
+
+// authentication
+import { authenticate, authorizationAdmin } from "../middleware/authMiddleware.js";
 
 // middleware
 import checkId from "../middleware/checkId.js";
 
 // controllers
-import
- { addProduct,
-    updateProductDetails,
-    removeProduct,
-    fetchProducts,
-    fetchProductById,
-    fetchAllProducts,
-    addProductReview,
-    fetchTopProducts,
-    fetchNewProducts
- } from "../controllers/productController.js";
+import {
+addProduct,
+updateProductDetails,
+removeProduct,
+fetchProducts,
+fetchProductById,
+fetchAllProducts,
+addProductReview,
+fetchTopProducts,
+fetchNewProducts
+} from "../controllers/productController.js";
+
+const upload = multer();
 
 router
-.route('/')
-.get(fetchProducts)
-.post(authenticate,authorizationAdmin,formidable(),addProduct);
+   .route('/')
+   .get(fetchProducts)
+   .post(authenticate, authorizationAdmin, upload.none(), addProduct);
 
 router.route('/allproducts').get(fetchAllProducts);
-router.route('/:id/reviews').post(authenticate,authorizationAdmin,checkId,addProductReview);
+router.route('/:id/reviews').post(authenticate, authorizationAdmin, checkId, addProductReview);
 router.route('/top').get(fetchTopProducts);
 router.route('/new').get(fetchNewProducts)
 
 
 router
-.route('/:id')
-.get(fetchProductById)
-.put(authenticate,authorizationAdmin,formidable(),updateProductDetails)
-.delete(authenticate,authorizationAdmin,removeProduct);
+   .route('/:id')
+   .get(fetchProductById)
+   .put(authenticate, authorizationAdmin, upload.none(), updateProductDetails)
+   .delete(authenticate, authorizationAdmin, removeProduct);
 
 
 
