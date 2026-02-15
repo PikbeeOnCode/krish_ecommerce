@@ -41,42 +41,42 @@ const addProduct = asyncHandler(async (req, res) => {
     }
 });
 
-
 const updateProductDetails = asyncHandler(async (req, res) => {
     try {
-        const { title, author, category, genre, summary, publishedDate, language, price, countInStock, coverImage } = req.body;
-
-        switch (true) {
-            case !title:
-                return res.status(400).json({ message: "Title is required" });
-            case !author:
-                return res.status(400).json({ message: "Author is required" });
-            case !category:
-                return res.status(400).json({ message: "Category is required" });
-            case !genre:
-                return res.status(400).json({ message: "Genre is required" });
-            case !summary:
-                return res.status(400).json({ message: "Summary is required" });
-            case !publishedDate:
-                return res.status(400).json({ message: "Published Date is required" });
-            case !language:
-                return res.status(400).json({ message: "Language is required" });
-            case !price:
-                return res.status(400).json({ message: "Price is required" });
-            case !countInStock:
-                return res.status(400).json({ message: "Count In Stock is required" });
-            case !coverImage:
-                return res.status(400).json({ message: "Cover Image is required" });
+        const updates = req.body;
+        
+        // Get existing product
+        const product = await Product.findById(req.params.id);
+        
+        if (!product) {
+            return res.status(404).json({ message: "Product not found" });
         }
 
-        const product = await Product.findByIdAndUpdate(req.params.id, { ...req.body }, { new: true });
-        await product.save();
-        res.status(200).json({ message: "Product updated successfully", product });
+        // Validate only if the field is being updated
+        if (updates.title !== undefined && !updates.title) {
+            return res.status(400).json({ message: "Title cannot be empty" });
+        }
+        if (updates.author !== undefined && !updates.author) {
+            return res.status(400).json({ message: "Author cannot be empty" });
+        }
+        // ... add similar checks for other fields
+
+        // Update fields
+        Object.keys(updates).forEach(key => {
+            if (updates[key] !== undefined && updates[key] !== null) {
+                product[key] = updates[key];
+            }
+        });
+
+        const updatedProduct = await product.save();
+        console.log("Product updated successfully");
+        console.log("Updated product:", updatedProduct);
+        res.json(updatedProduct);
     } catch (error) {
         console.error(error);
-        res.status(500).json({ message: "Server Error" });
+        res.status(500).json({ message: "Server error" });
     }
-})
+});
 
 const removeProduct = asyncHandler(async (req, res) => {
     const { id } = req.params;

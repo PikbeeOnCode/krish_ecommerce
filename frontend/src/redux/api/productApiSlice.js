@@ -1,34 +1,39 @@
 import { apiSlice } from "./apiSlice";
 import { PRODUCT_URL, UPLOAD_URL } from "../features/constant";
-import { data } from "react-router";
 
 export const productApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         getProducts: builder.query({
             query: ({ filter }) => ({
                 url: `${PRODUCT_URL}`,
-                params: { filter, },
+                params: { filter },
             }),
             keepUnusedDataFor: 5,
             providesTags: ['Products'],
         }),
+
         getProductsByID: builder.query({
             query: (productId) => ({
                 url: `${PRODUCT_URL}/${productId}`,
-
             }),
-            providesTags: (result, Error, productId) => [{ type: 'Products', id: productId }],
-
+            providesTags: (result, error, productId) => [
+                { type: 'Products', id: productId }
+            ],
+            keepUnusedDataFor: 0, // Don't cache - always fetch fresh data
         }),
 
         allProducts: builder.query({
             query: () => `${PRODUCT_URL}/allProducts`,
+            providesTags: ['Products'],
         }),
 
         getProductsDetail: builder.query({
             query: (productId) => ({
                 url: `${PRODUCT_URL}/${productId}`,
-            })
+            }),
+            providesTags: (result, error, productId) => [
+                { type: 'Products', id: productId }
+            ],
         }),
 
         createProduct: builder.mutation({
@@ -45,7 +50,12 @@ export const productApiSlice = apiSlice.injectEndpoints({
                 url: `${PRODUCT_URL}/${productId}`,
                 method: 'PUT',
                 body: formData,
-            })
+            }),
+            // ADD THIS - This was missing!
+            invalidatesTags: (result, error, { productId }) => [
+                { type: 'Products', id: productId },
+                'Products',
+            ],
         }),
 
         uploadProductImage: builder.mutation({
@@ -53,7 +63,7 @@ export const productApiSlice = apiSlice.injectEndpoints({
                 url: `${UPLOAD_URL}`,
                 method: 'POST',
                 body: data,
-            })
+            }),
         }),
 
         deleteProduct: builder.mutation({
@@ -61,27 +71,32 @@ export const productApiSlice = apiSlice.injectEndpoints({
                 url: `${PRODUCT_URL}/${productId}`,
                 method: 'DELETE',
             }),
-            providesTags: ['Products'],
+            // FIXED - should be invalidatesTags, not providesTags
+            invalidatesTags: ['Products'],
         }),
+
         createReview: builder.mutation({
             query: (data) => ({
                 url: `${PRODUCT_URL}/${data.productId}/reviews`,
                 method: 'POST',
                 body: data,
-            })
+            }),
+            invalidatesTags: (result, error, { productId }) => [
+                { type: 'Products', id: productId },
+            ],
         }),
 
         getTopProducts: builder.query({
             query: () => `${PRODUCT_URL}/top`,
             keepUnusedDataFor: 5,
+            providesTags: ['Products'],
         }),
 
         getnewCategories: builder.query({
             query: () => `${PRODUCT_URL}/new`,
             keepUnusedDataFor: 5,
+            providesTags: ['Products'],
         }),
-
-
     })
 })
 
