@@ -8,12 +8,14 @@ import { Provider } from 'react-redux'
 import store from './redux/features/store.js';
 import Profile from './pages/user/profile.jsx'
 
-
+// navigation
+import Home from './Home.jsx'
+import Favorites from './pages/Products/Favourites.jsx'
+import ProductDetails from './pages/Products/ProductDetails.jsx'
 // private route
 import PrivateRoutes from './components/PrivateRoutes.jsx'
 
 //  auth
-
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx'
 
@@ -31,8 +33,11 @@ const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<App />} >
 
-     <Route path='/login' element={<Login />} />
+   <Route path='/login' element={<Login />} />
     <Route path='/register' element={<Register />} />
+    <Route index={true} path='/' element={<Home />} />
+    <Route path='/favorite' element={<Favorites />} />
+    <Route path='/product/:id' element={<ProductDetails />} />
 
     <Route path='' element={<PrivateRoutes />} >
       <Route path='/profile' element={<Profile />} />

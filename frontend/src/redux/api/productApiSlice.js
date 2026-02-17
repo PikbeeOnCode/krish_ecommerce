@@ -3,10 +3,14 @@ import { PRODUCT_URL, UPLOAD_URL } from "../features/constant";
 
 export const productApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-        getProducts: builder.query({
-            query: ({ filter }) => ({
+            getProducts: builder.query({
+            query: ({ search, page, limit } = {}) => ({
                 url: `${PRODUCT_URL}`,
-                params: { filter },
+                params: { 
+                    search,
+                    page,
+                    limit
+                },
             }),
             keepUnusedDataFor: 5,
             providesTags: ['Products'],

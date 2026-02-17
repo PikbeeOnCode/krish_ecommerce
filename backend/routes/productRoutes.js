@@ -30,7 +30,7 @@ router
    .post(authenticate, authorizationAdmin, upload.none(), addProduct);
 
 router.route('/allproducts').get(fetchAllProducts);
-router.route('/:id/reviews').post(authenticate, authorizationAdmin, checkId, addProductReview);
+router.route('/:id/reviews').post(authenticate, checkId, addProductReview);
 router.route('/top').get(fetchTopProducts);
 router.route('/new').get(fetchNewProducts)
 
