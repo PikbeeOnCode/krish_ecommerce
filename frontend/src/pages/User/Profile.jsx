@@ -109,7 +109,7 @@ const submitHandler = async(e) => {
                     update
                   </button>
                   <Link 
-                  to='/user-orders'
+                  to='/userorder'
                   className='bg-pink-600 text-white py-2 px-4 rounded hover:bg-pink-600'>
                     My orders 
                   </Link>

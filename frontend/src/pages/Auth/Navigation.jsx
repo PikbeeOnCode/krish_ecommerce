@@ -17,8 +17,10 @@ import FavoritesCount from "../Products/FavoriteCount";
 
 const Navigation = () => {
   const { userInfo } = useSelector((state) => state.auth);
+  const {cartItems} = useSelector((state) => state.cart);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [showSidebar, setShowSidebar] = useState(false);
+  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -55,49 +57,58 @@ const Navigation = () => {
         text-white bg-black w-[4%] hover:w-[15%] h-[100vh] fixed`}
     >
       {/* ----------- Navigation Links ----------- */}
-          <div className="flex flex-col justify-center space-y-4">
-            <Link
-              to="/"
-              className="flex items-center transition-transform transform hover:translate-x-2"
-            >
-              <div className="mr-2 mt-[3rem]">
-                <AiOutlineHome size={26} />
-              </div>
-              <span className="hidden nav-item-name mt-[3rem]">HOME</span>
-            </Link>
+      <div className="flex flex-col justify-center space-y-4">
+      <Link
+        to="/"
+        className="flex items-center transition-transform transform hover:translate-x-2"
+      >
+        <div className="mr-2 mt-[3rem]">
+          <AiOutlineHome size={26} />
+        </div>
+        <span className="hidden nav-item-name mt-[3rem]">HOME</span>
+      </Link>
 
-            <Link
-              to="/shop"
-              className="flex items-center transition-transform transform hover:translate-x-2"
-            >
-              <div className="mr-2 mt-[3rem]">
-                <AiOutlineShopping size={26} />
-              </div>
-              <span className="hidden nav-item-name mt-[3rem]">SHOP</span>
-            </Link>
+      <Link
+        to="/shop"
+        className="flex items-center transition-transform transform hover:translate-x-2"
+      >
+        <div className="mr-2 mt-[3rem]">
+          <AiOutlineShopping size={26} />
+        </div>
+        <span className="hidden nav-item-name mt-[3rem]">SHOP</span>
+      </Link>
 
-            <Link
-              to="/cart"
-              className="flex items-center transition-transform transform hover:translate-x-2"
-            >
-              <div className="mr-2 mt-[3rem]">
-                <AiOutlineShoppingCart size={26} />
-              </div>
-              <span className="hidden nav-item-name mt-[3rem]">CART</span>
-            </Link>
+      <Link
+        to="/cart"
+        className="flex relative"  
+      >
+        <div className="flex items-center transition-transform transform hover:translate-x-2">
+          <div className="mr-2 mt-[3rem]">
+            <AiOutlineShoppingCart size={26} />
+          </div>
+          <span className="hidden nav-item-name mt-[3rem]">CART</span>
+        </div>
+        <div className="absolute top-9 left-3">
+          {cartItems.length > 0 && (
+            <span className="px-1 py-0 text-sm text-white bg-pink-500 rounded-full">
+              {cartItems.reduce((a, c) => a + c.qty, 0)}
+            </span>
+          )}
+        </div>
+      </Link>
 
-            <Link to="/favorite" className="flex relative">
-              <div className="flex items-center transition-transform transform hover:translate-x-2">
-                <div className="mr-2 mt-[3rem]">
-                  <FaHeart size={26} />
-                </div>
-                <span className="hidden nav-item-name mt-[3rem]">FAVORITES</span>
-              </div>
-              <div className="absolute top-9 left-3">
-                <FavoritesCount />
-              </div>
-            </Link>
-          </div>  
+      <Link to="/favorite" className="flex relative">
+        <div className="flex items-center transition-transform transform hover:translate-x-2">
+          <div className="mr-2 mt-[3rem]">
+            <FaHeart size={26} />
+          </div>
+          <span className="hidden nav-item-name mt-[3rem]">FAVORITES</span>
+        </div>
+        <div className="absolute top-9 left-3">
+          <FavoritesCount />
+        </div>
+      </Link>
+    </div>
 
       {/* ----------- User Section ----------- */}
       <div className="relative">
@@ -153,14 +164,7 @@ const Navigation = () => {
               Add Product
             </Link>
           </li>
-          <li>
-            <Link
-              to="/admin/categorylists"
-              className="block px-4 py-2 hover:bg-gray-100"
-            >
-              Category
-            </Link>
-          </li>
+          
           <li>
             <Link
               to="/admin/orderlist"

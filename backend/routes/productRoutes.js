@@ -19,7 +19,8 @@ fetchProductById,
 fetchAllProducts,
 addProductReview,
 fetchTopProducts,
-fetchNewProducts
+fetchNewProducts,
+filterProducts
 } from "../controllers/productController.js";
 
 const upload = multer();
@@ -41,7 +42,7 @@ router
    .put(authenticate, authorizationAdmin, upload.none(), updateProductDetails)
    .delete(authenticate, authorizationAdmin, removeProduct);
 
-
+router.route("/filtered-products").post(filterProducts);
 
 
 export default router;

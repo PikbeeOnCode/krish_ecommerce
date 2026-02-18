@@ -32,21 +32,23 @@ const ProductDetails = () => {
   const [createReview, { isLoading: loadingProductReview }] =
     useCreateReviewMutation();
 
-  const submitHandler = async (e) => {
-    e.preventDefault();
+const submitHandler = async (e) => {
+  e.preventDefault();
 
-    try {
-      await createReview({
-        productId,
-        rating,
-        comment,
-      }).unwrap();
-      refetch();
-      toast.success("Review created successfully");
-    } catch (error) {
-      toast.error(error?.data || error.message);
-    }
-  };
+  try {
+    await createReview({
+      productId,
+      rating,
+      comment,
+    }).unwrap();
+    refetch();
+    toast.success("Review created successfully");
+    setRating(0);
+    setComment("");
+  } catch (error) {
+    toast.error(error?.data?.message || error?.message || "Something went wrong"); // ← fix here
+  }
+};
 
   const addToCartHandler = () => {
     dispatch(addToCart({ ...product, qty }));

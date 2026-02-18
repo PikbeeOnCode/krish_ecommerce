@@ -3,14 +3,10 @@ import { PRODUCT_URL, UPLOAD_URL } from "../features/constant";
 
 export const productApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
-            getProducts: builder.query({
+        getProducts: builder.query({
             query: ({ search, page, limit } = {}) => ({
                 url: `${PRODUCT_URL}`,
-                params: { 
-                    search,
-                    page,
-                    limit
-                },
+                params: { search, page, limit },
             }),
             keepUnusedDataFor: 5,
             providesTags: ['Products'],
@@ -23,7 +19,7 @@ export const productApiSlice = apiSlice.injectEndpoints({
             providesTags: (result, error, productId) => [
                 { type: 'Products', id: productId }
             ],
-            keepUnusedDataFor: 0, // Don't cache - always fetch fresh data
+            keepUnusedDataFor: 0,
         }),
 
         allProducts: builder.query({
@@ -55,7 +51,6 @@ export const productApiSlice = apiSlice.injectEndpoints({
                 method: 'PUT',
                 body: formData,
             }),
-            // ADD THIS - This was missing!
             invalidatesTags: (result, error, { productId }) => [
                 { type: 'Products', id: productId },
                 'Products',
@@ -75,7 +70,6 @@ export const productApiSlice = apiSlice.injectEndpoints({
                 url: `${PRODUCT_URL}/${productId}`,
                 method: 'DELETE',
             }),
-            // FIXED - should be invalidatesTags, not providesTags
             invalidatesTags: ['Products'],
         }),
 
@@ -101,8 +95,17 @@ export const productApiSlice = apiSlice.injectEndpoints({
             keepUnusedDataFor: 5,
             providesTags: ['Products'],
         }),
-    })
-})
+
+        getFilteredProducts: builder.query({
+            query: ({ checked, radio }) => ({
+                url: `${PRODUCT_URL}/filtered-products`,
+                method: "POST",
+                body: { checked, radio },
+            }),
+            providesTags: ['Products'], // ← was missing
+        }),
+    }) // ← closes endpoints
+}) // ← closes injectEndpoints
 
 export const {
     useGetProductsQuery,
@@ -115,5 +118,6 @@ export const {
     useGetTopProductsQuery,
     useGetnewCategoriesQuery,
     useGetProductsDetailQuery,
-    useUploadProductImageMutation
+    useUploadProductImageMutation,
+    useGetFilteredProductsQuery, // ← was missing
 } = productApiSlice
