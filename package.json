@@ -2,8 +2,10 @@
   "name": "krishstore",
   "version": "1.0.0",
   "description": "",
+  
   "main": "index.js",
   "scripts": {
+    "start": "node backend/index.js",
     "backend": "nodemon backend/index.js",
     "frontend": "npm run dev --prefix frontend ",
     "dev": "concurrently \"npm run frontend\"\"npm run backend\""
