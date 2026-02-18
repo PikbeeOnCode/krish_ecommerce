@@ -1,17 +1,25 @@
-import path from "path";
 import express from "express";
 import multer from "multer";
+import { v2 as cloudinary } from "cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
+import path from "path";
 
 const router = express.Router();
 
-// ---------- MULTER STORAGE ----------
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
+// ---------- CLOUDINARY CONFIG ----------
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+// ---------- CLOUDINARY STORAGE ----------
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "krish-ecommerce",
+    allowed_formats: ["jpeg", "jpg", "png", "webp"],
   },
-  filename: (req, file, cb) => {
-    cb(null, `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`);
-  }
 });
 
 // ---------- FILE FILTER ----------
@@ -41,13 +49,10 @@ router.post("/", (req, res) => {
       return res.status(400).json({ message: "Please upload an image" });
     }
 
-    // Normalize path (fixes Windows backslash issue)
-    const image = req.file.path.replace(/\\/g, "/");
-
     res.status(200).json({
       message: "Image uploaded successfully",
-      image: `/${image}`,                           // for saving to DB
-      imageUrl: `http://localhost:3000/${image}`    // for frontend preview
+      image: req.file.path,        // Cloudinary URL saved to DB
+      imageUrl: req.file.path      // Cloudinary URL for frontend preview
     });
   });
 });
