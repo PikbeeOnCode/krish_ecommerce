@@ -6,7 +6,7 @@ import { Route,RouterProvider,createRoutesFromElements } from 'react-router'
 import { createBrowserRouter } from 'react-router-dom';
 import { Provider } from 'react-redux'
 import store from './redux/features/store.js';
-import Profile from './pages/user/Profile.jsx'
+import Profile from './pages/User/Profile.jsx';
 
 // navigation
 import Home from './pages/Home.jsx'
