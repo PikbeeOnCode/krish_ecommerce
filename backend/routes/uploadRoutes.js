@@ -1,9 +1,11 @@
+import dotenv from "dotenv";
+dotenv.config();
+
 import express from "express";
 import multer from "multer";
 import { v2 as cloudinary } from "cloudinary";
 import { CloudinaryStorage } from "multer-storage-cloudinary";
 import path from "path";
-
 const router = express.Router();
 
 // ---------- CLOUDINARY CONFIG ----------
@@ -11,6 +13,12 @@ cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+console.log("Cloudinary config:", {
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY? "loaded" : "MISSING",
+  api_secret: process.env.CLOUDINARY_API_SECRET ? "loaded" : "MISSING"
 });
 
 // ---------- CLOUDINARY STORAGE ----------
@@ -42,17 +50,20 @@ const uploadSingleImage = upload.single("image");
 router.post("/", (req, res) => {
   uploadSingleImage(req, res, (err) => {
     if (err) {
+      console.log("Upload error:", err);
       return res.status(400).json({ message: err.message });
     }
 
     if (!req.file) {
+      console.log("No file received");
       return res.status(400).json({ message: "Please upload an image" });
     }
 
+    console.log("Upload success:", req.file.path);
     res.status(200).json({
       message: "Image uploaded successfully",
-      image: req.file.path,        // Cloudinary URL saved to DB
-      imageUrl: req.file.path      // Cloudinary URL for frontend preview
+      image: req.file.path,
+      imageUrl: req.file.path
     });
   });
 });

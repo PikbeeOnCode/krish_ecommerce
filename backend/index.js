@@ -1,11 +1,13 @@
+import dotenv from "dotenv";
+dotenv.config(); // must be before everything else!
+
 // packages
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
-import dotenv from "dotenv";
 import cors from "cors";
 
-// utilites
+// utilities
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
@@ -13,7 +15,6 @@ import productRoutes from "./routes/productRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 
-dotenv.config();
 const PORT = process.env.PORT || 3000;
 
 connectDB();
