@@ -4,32 +4,51 @@ import asyncHandler from "../middleware/asyncHandler.js";
 import createToken from "../utils/createtoken.js"
 
 const createUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  let { username, email, password } = req.body;
 
+  // trim whitespace
+  username = username?.trim();
+  email = email?.trim().toLowerCase();
+
+  // check required fields
   if (!username || !email || !password) {
     res.status(400);
     throw new Error("Fill all the inputs");
   }
 
+  // validate email format
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    res.status(400);
+    throw new Error("Invalid email format");
+  }
+
+  // check password length
+  if (password.length < 8) {
+    res.status(400);
+    throw new Error("Password must be at least 8 characters");
+  }
+
+  // check if user exists
   const userExist = await User.findOne({ email });
   if (userExist) {
     return res.status(400).send("User email is already registered :)");
   }
 
   const salt = await bcrypt.genSalt(10);
-  const hashedPassword = await bcrypt.hash(password,salt);
+  const hashedPassword = await bcrypt.hash(password, salt);
 
-  const newUser = new User({ username, email, password:hashedPassword });
+  const newUser = new User({ username, email, password: hashedPassword });
 
   try {
-   const savedUser = await newUser.save();
-   createToken(res,savedUser._id)
+    const savedUser = await newUser.save();
+    createToken(res, savedUser._id);
 
     res.status(201).json({
-      _id:savedUser._id,
-      username:savedUser.username,
-      email:savedUser.email,
-      isAdmin:savedUser.isAdmin,
+      _id: savedUser._id,
+      username: savedUser.username,
+      email: savedUser.email,
+      isAdmin: savedUser.isAdmin,
     });
   } catch (error) {
     console.error("User save error:", error.message);
