@@ -41,14 +41,3 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 app.listen(PORT, () => {
   console.log("Port 3000 is listening!");
 });
-```
-
-Now also delete your `config/db.js` file since you don't need it anymore — Supabase handles the connection automatically when you use the client.
-
-Your `.env` should now look like this:
-```
-PORT=3000
-JWT_SECRET=your_jwt_secret
-SUPABASE_URL=your_supabase_url
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-PAYPAL_CLIENT_ID=your_paypal_client_id
