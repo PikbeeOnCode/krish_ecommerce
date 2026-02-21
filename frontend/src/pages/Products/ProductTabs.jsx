@@ -56,7 +56,6 @@ const ProductTabs = ({
         </div>
       </section>
 
-      {/* Second Part */}
       <section>
         {activeTab === 1 && (
           <div className="mt-4">

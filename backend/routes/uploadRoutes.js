@@ -8,7 +8,6 @@ import { CloudinaryStorage } from "multer-storage-cloudinary";
 import path from "path";
 const router = express.Router();
 
-// ---------- CLOUDINARY CONFIG ----------
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -21,7 +20,6 @@ console.log("Cloudinary config:", {
   api_secret: process.env.CLOUDINARY_API_SECRET ? "loaded" : "MISSING"
 });
 
-// ---------- CLOUDINARY STORAGE ----------
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -30,7 +28,6 @@ const storage = new CloudinaryStorage({
   },
 });
 
-// ---------- FILE FILTER ----------
 const fileFilter = (req, file, cb) => {
   const allowed = /jpeg|jpg|png|webp/;
   const ext = path.extname(file.originalname).toLowerCase();
@@ -46,7 +43,6 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage, fileFilter });
 const uploadSingleImage = upload.single("image");
 
-// ---------- ROUTE ----------
 router.post("/", (req, res) => {
   uploadSingleImage(req, res, (err) => {
     if (err) {

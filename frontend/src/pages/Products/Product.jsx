@@ -12,15 +12,13 @@ const Product = ({ product }) => {
           className="w-full h-[26rem] object-cover rounded-lg transition-transform duration-300 group-hover:scale-105"
         />
         <HeartIcon product={product} />
-        
-        {/* Stock Badge */}
+
         {product.countInStock === 0 && (
           <div className="absolute top-3 left-3 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full">
             Out of Stock
           </div>
         )}
-        
-        {/* Price Badge */}
+
         <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full">
           ${product.price}
         </div>
@@ -37,7 +35,6 @@ const Product = ({ product }) => {
           by {product.author}
         </p>
 
-        {/* Rating and Reviews */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <FaStar className="text-yellow-400 text-sm" />

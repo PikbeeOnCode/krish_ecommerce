@@ -20,7 +20,6 @@ const AllProductsList = () => {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl">
-      {/* Header */}
       <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <h1 className="text-2xl md:text-3xl font-bold text-gray-800">
           All Products
@@ -29,7 +28,6 @@ const AllProductsList = () => {
           </span>
         </h1>
 
-        {/* Optional: Add new product button */}
         <Link
           to="/admin/productlist"
           className="inline-flex items-center px-5 py-2.5 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors font-medium shadow-sm"
@@ -38,7 +36,6 @@ const AllProductsList = () => {
         </Link>
       </div>
 
-      {/* Products Grid */}
       {products?.length === 0 ? (
         <div className="py-16 text-center text-gray-500 bg-gray-50 rounded-xl border border-dashed">
           <p className="text-lg">No products found</p>
@@ -51,19 +48,17 @@ const AllProductsList = () => {
               key={product._id}
               className="group bg-white rounded-xl overflow-hidden border border-gray-200 shadow-sm hover:shadow-md hover:border-pink-200 transition-all duration-200 flex flex-col h-full"
             >
-              {/* Image */}
               <div className="aspect-[4/3] relative overflow-hidden bg-gray-100">
                 <img
                   src={product.coverImage}
                   alt={product.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   onError={(e) => {
-                    e.target.src = '/images/fallback-product.jpg'; // ← add your fallback image
+                    e.target.src = '/images/fallback-product.jpg';
                   }}
                 />
               </div>
 
-              {/* Content */}
               <div className="p-4 flex flex-col flex-grow">
                 <h3 className="font-semibold text-gray-800 line-clamp-2 mb-1.5 min-h-[2.8rem]">
                   {product.title}

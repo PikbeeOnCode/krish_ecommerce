@@ -9,7 +9,6 @@ import
     readCategory
     } from "../controllers/categoryController.js";
 
-// auth
 import {authenticate,authorizationAdmin} from "../middleware/authMiddleware.js"
 
 router.route("/").post(authenticate,authorizationAdmin,createCategory);

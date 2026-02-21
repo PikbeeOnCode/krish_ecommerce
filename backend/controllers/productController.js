@@ -1,205 +1,262 @@
-import { parse } from "dotenv";
+import { supabase } from "../config/supabaseClient.js";
 import asyncHandler from "../middleware/asyncHandler.js";
-import Product from "../models/ProductModel.js";
-import mongoose from "mongoose";
-
 
 const addProduct = asyncHandler(async (req, res) => {
-    try {
-        console.log('req.body:', req.body); // Your form data form-data
-        // ✅ CORRECT
-        const { title, author, category, genre, summary, publishedDate, language, price, countInStock, coverImage } = req.body;
-        switch (true) {
-            case !title:
-                return res.status(400).json({ message: "Title is required" });
-            case !author:
-                return res.status(400).json({ message: "Author is required" });
-            case !category:
-                return res.status(400).json({ message: "Category is required" });
-            case !genre:
-                return res.status(400).json({ message: "Genre is required" });
-            case !summary:
-                return res.status(400).json({ message: "Summary is required" });
-            case !publishedDate:
-                return res.status(400).json({ message: "Published Date is required" });
-            case !language:
-                return res.status(400).json({ message: "Language is required" });
-            case !price:
-                return res.status(400).json({ message: "Price is required" });
-            case !countInStock:
-                return res.status(400).json({ message: "Count In Stock is required" });
-            case !coverImage:
-                return res.status(400).json({ message: "Cover Image is required" });
-        }
-        const product = new Product({ ...req.body });
-        await product.save();
-        res.status(201).json({ message: "Product added successfully", product });
-    } catch (error) {
-        console.error(error);
+  try {
+    const { title, author, category, genre, summary, publishedDate, language, price, countInStock, coverImage } = req.body;
 
-        res.status(500).json({ message: error.message });
+    switch (true) {
+      case !title: return res.status(400).json({ message: "Title is required" });
+      case !author: return res.status(400).json({ message: "Author is required" });
+      case !category: return res.status(400).json({ message: "Category is required" });
+      case !genre: return res.status(400).json({ message: "Genre is required" });
+      case !summary: return res.status(400).json({ message: "Summary is required" });
+      case !publishedDate: return res.status(400).json({ message: "Published Date is required" });
+      case !language: return res.status(400).json({ message: "Language is required" });
+      case !price: return res.status(400).json({ message: "Price is required" });
+      case !countInStock: return res.status(400).json({ message: "Count In Stock is required" });
+      case !coverImage: return res.status(400).json({ message: "Cover Image is required" });
     }
+
+    const { data, error } = await supabase
+      .from("products")
+      .insert([{
+        title,
+        author,
+        category_id: category,
+        genre,
+        summary,
+        published_date: publishedDate,
+        language,
+        price,
+        count_in_stock: countInStock,
+        cover_image: coverImage,
+      }])
+      .select()
+      .single();
+
+    if (error) throw error;
+    res.status(201).json({ message: "Product added successfully", product: data });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: error.message });
+  }
 });
 
 const updateProductDetails = asyncHandler(async (req, res) => {
-    try {
-        const updates = req.body;
-        
-        // Get existing product
-        const product = await Product.findById(req.params.id);
-        
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        }
+  try {
+    const { title, author, category, genre, summary, publishedDate, language, price, countInStock, coverImage } = req.body;
 
-        // Validate only if the field is being updated
-        if (updates.title !== undefined && !updates.title) {
-            return res.status(400).json({ message: "Title cannot be empty" });
-        }
-        if (updates.author !== undefined && !updates.author) {
-            return res.status(400).json({ message: "Author cannot be empty" });
-        }
-        // ... add similar checks for other fields
+    if (title !== undefined && !title) return res.status(400).json({ message: "Title cannot be empty" });
+    if (author !== undefined && !author) return res.status(400).json({ message: "Author cannot be empty" });
 
-        // Update fields
-        Object.keys(updates).forEach(key => {
-            if (updates[key] !== undefined && updates[key] !== null) {
-                product[key] = updates[key];
-            }
-        });
+    const updates = {};
+    if (title) updates.title = title;
+    if (author) updates.author = author;
+    if (category) updates.category_id = category;
+    if (genre) updates.genre = genre;
+    if (summary) updates.summary = summary;
+    if (publishedDate) updates.published_date = publishedDate;
+    if (language) updates.language = language;
+    if (price) updates.price = price;
+    if (countInStock) updates.count_in_stock = countInStock;
+    if (coverImage) updates.cover_image = coverImage;
+    updates.updated_at = new Date();
 
-        const updatedProduct = await product.save();
-        console.log("Product updated successfully");
-        console.log("Updated product:", updatedProduct);
-        res.json(updatedProduct);
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: "Server error" });
-    }
+    const { data, error } = await supabase
+      .from("products")
+      .update(updates)
+      .eq("id", req.params.id)
+      .select()
+      .single();
+
+    if (error || !data) return res.status(404).json({ message: "Product not found" });
+
+    res.json(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
 });
 
 const removeProduct = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "Invalid product ID format" });
-    }
+  try {
+    const { data, error } = await supabase
+      .from("products")
+      .delete()
+      .eq("id", req.params.id)
+      .select()
+      .single();
 
-    try {
-        console.log("Deleting product with id:", id);
-        const product = await Product.findByIdAndDelete(id);
-        if (!product) {
-            return res.status(404).json({ message: "Product not found" });
-        } return res.status(200).json({ message: "Product deleted successfully" });
-    } catch (error) {
-        console.log(error);
-        return res.status(500).json({ message: "Server Error" });
-    }
+    if (error || !data) return res.status(404).json({ message: "Product not found" });
+
+    res.status(200).json({ message: "Product deleted successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server Error" });
+  }
 });
 
 const fetchProducts = asyncHandler(async (req, res) => {
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    const filter = {};
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const from = (page - 1) * limit;
+  const to = from + limit - 1;
 
-    if (req.query.search) {
-        filter.title = { $regex: req.query.search, $options: 'i' };
-    }
+  let query = supabase.from("products").select("*", { count: "exact" });
 
+  if (req.query.search) {
+    query = query.ilike("title", `%${req.query.search}%`);
+  }
 
-    const products = await Product.find(filter).limit(limit).skip(skip).sort({ createdAt: -1 });
+  const { data, count, error } = await query
+    .order("created_at", { ascending: false })
+    .range(from, to);
 
-    const totalProducts = await Product.countDocuments(filter);
+  if (error) throw error;
 
-    const totalPages = Math.ceil(totalProducts / limit);
+  if (!data || data.length === 0) {
+    return res.status(404).json({ message: "No products found" });
+  }
 
-    if (products.length === 0) {
-        return res.status(404).json({ message: "No products found" });
-    } return res.status(200).json({ products, currentPage: page, totalPages, totalProducts, hasnextPage: page < totalPages, hasPrevPage: page > 1 });
+  const totalPages = Math.ceil(count / limit);
 
+  res.status(200).json({
+    products: data,
+    currentPage: page,
+    totalPages,
+    totalProducts: count,
+    hasNextPage: page < totalPages,
+    hasPrevPage: page > 1,
+  });
 });
 
 const fetchProductById = asyncHandler(async (req, res) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-        return res.status(400).json({ message: "Invalid product ID format" });
-    }
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .eq("id", req.params.id)
+    .single();
 
-    const product = await Product.findById(id);
-    if (!product) {
-        return res.status(404).json({ message: "Product not found" });
-    } return res.status(200).json(product);
-})
+  if (error || !data) return res.status(404).json({ message: "Product not found" });
+
+  res.status(200).json(data);
+});
 
 const fetchAllProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).populate('category').sort({ createdAt: -1 }).limit(12);
-    if (products.length === 0) {
-        return res.status(404).json({ message: "No products found" });
-    }
+  const { data, error } = await supabase
+    .from("products")
+    .select("*, categories(name)")
+    .order("created_at", { ascending: false })
+    .limit(12);
 
-    return res.status(200).json(products);
-})
+  if (error) throw error;
 
+  if (!data || data.length === 0) {
+    return res.status(404).json({ message: "No products found" });
+  }
+
+  res.status(200).json(data);
+});
 
 const addProductReview = asyncHandler(async (req, res) => {
-    const { rating, comment } = req.body;
-    const product = await Product.findById(req.params.id);
-    if (product) {
-        const alreadyReviewed = product.reviews.find(r => r.user.toString() === req.user._id.toString());
+  const { rating, comment } = req.body;
 
-        if (alreadyReviewed) {
-            return res.status(400).json({ message: "Product already reviewed" });
-        }
-        console.log("User in req:", req.user);
+  // check if product exists
+  const { data: product, error: productError } = await supabase
+    .from("products")
+    .select("*, reviews(*)")
+    .eq("id", req.params.id)
+    .single();
 
-        const review = {
-            name: req.user.username,
-            rating: Number(rating),
-            comment,
-            user: req.user._id
-        }
+  if (productError || !product) {
+    return res.status(404).json({ message: "Product not found" });
+  }
 
-        product.reviews.push(review);
-        product.numReviews = product.reviews.length;
-        product.rating = product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+  // check if already reviewed
+  const { data: existingReview } = await supabase
+    .from("reviews")
+    .select("*")
+    .eq("product_id", req.params.id)
+    .eq("user_id", req.user._id)
+    .single();
 
-        await product.save();
-        console.log("Review added successfully");
-        res.status(201).json({ message: "Review added" });
-    } else {
-        res.status(404).json({ message: "Product not found" });
-        console.log("Product not found");
-        throw new Error("Product not found");
+  if (existingReview) {
+    return res.status(400).json({ message: "Product already reviewed" });
+  }
 
-    }
-})
+  // add review
+  const { error: reviewError } = await supabase.from("reviews").insert([{
+    product_id: req.params.id,
+    user_id: req.user._id,
+    name: req.user.username,
+    rating: Number(rating),
+    comment,
+  }]);
+
+  if (reviewError) throw reviewError;
+
+  // update ratings and numReviews on product
+  const { data: allReviews } = await supabase
+    .from("reviews")
+    .select("rating")
+    .eq("product_id", req.params.id);
+
+  const numReviews = allReviews.length;
+  const ratings = allReviews.reduce((acc, r) => acc + r.rating, 0) / numReviews;
+
+  await supabase
+    .from("products")
+    .update({ ratings, num_reviews: numReviews, updated_at: new Date() })
+    .eq("id", req.params.id);
+
+  res.status(201).json({ message: "Review added" });
+});
 
 const fetchTopProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).sort({ ratings: -1 }).limit(4);
-    if (products.length === 0) {
-        return res.status(404).json({ message: "No products found" });
-    }
-    res.json(products);
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("ratings", { ascending: false })
+    .limit(4);
+
+  if (error) throw error;
+  if (!data || data.length === 0) return res.status(404).json({ message: "No products found" });
+
+  res.json(data);
 });
 
 const fetchNewProducts = asyncHandler(async (req, res) => {
-    const products = await Product.find({}).sort({ createdAt: -1 }).limit(4);
-    if (products.length === 0) {
-        return res.status(404).json({ message: "No products found" });
-    }
+  const { data, error } = await supabase
+    .from("products")
+    .select("*")
+    .order("created_at", { ascending: false })
+    .limit(4);
 
-    res.json(products);
+  if (error) throw error;
+  if (!data || data.length === 0) return res.status(404).json({ message: "No products found" });
+
+  res.json(data);
 });
+
 const filterProducts = asyncHandler(async (req, res) => {
   try {
     const { checked, radio } = req.body;
 
-    let args = {};
-    if (checked.length > 0) args.category = checked;
-    if (radio.length) args.price = { $gte: radio[0], $lte: radio[1] };
+    let query = supabase.from("products").select("*");
 
-    const products = await Product.find(args);
-    res.json(products);
+    if (checked && checked.length > 0) {
+      query = query.in("category_id", checked);
+    }
+
+    if (radio && radio.length === 2) {
+      query = query.gte("price", radio[0]).lte("price", radio[1]);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+
+    res.json(data);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });
@@ -207,14 +264,14 @@ const filterProducts = asyncHandler(async (req, res) => {
 });
 
 export {
-    addProduct,
-    updateProductDetails,
-    removeProduct,
-    fetchProducts,
-    fetchProductById,
-    fetchAllProducts,
-    addProductReview,
-    fetchTopProducts,
-    fetchNewProducts,
-    filterProducts
+  addProduct,
+  updateProductDetails,
+  removeProduct,
+  fetchProducts,
+  fetchProductById,
+  fetchAllProducts,
+  addProductReview,
+  fetchTopProducts,
+  fetchNewProducts,
+  filterProducts,
 };

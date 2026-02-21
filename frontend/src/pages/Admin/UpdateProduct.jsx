@@ -49,8 +49,7 @@ const UpdateProduct = () => {
       setCategory(productData.category || '')
       setGenre(productData.genre || '')
       setSummary(productData.summary || '')
-      
-      // Format date properly for date input
+
       if (productData.publishedDate) {
         const dateObj = new Date(productData.publishedDate)
         const formattedDate = dateObj.toISOString().split('T')[0]
@@ -86,7 +85,6 @@ const UpdateProduct = () => {
   const handleUpdate = async (e) => {
     e.preventDefault()
 
-    // Validate non-empty fields
     if (!title?.trim()) {
       toast.error('Title cannot be empty')
       return
@@ -138,7 +136,6 @@ const UpdateProduct = () => {
     }
 
     try {
-      // Format the date properly (yyyy-MM-dd)
       let formattedDate = publishedDate
       if (publishedDate) {
         const dateObj = new Date(publishedDate)
@@ -147,7 +144,6 @@ const UpdateProduct = () => {
         }
       }
 
-      // Build update object with all fields
       const productData = {
         title: title.trim(),
         author: author.trim(),
@@ -161,7 +157,7 @@ const UpdateProduct = () => {
         coverImage: imageUrl,
       }
 
-      console.log('Sending update data:', productData) // Debug
+      console.log('Sending update data:', productData)
 
       await updateProduct({ productId: params._id, formData: productData }).unwrap()
       toast.success('Product updated successfully')

@@ -18,12 +18,11 @@ const Profile = () => {
   const [updateProfile,{isLoading:loadingUpdateprofile}] = useProfileMutation();
 
  useEffect(() => {
-  // Add a check to ensure userInfo exists before accessing its properties
   if (userInfo) {
     setUsername(userInfo.username);
     setEmail(userInfo.email);
   }
-}, [userInfo]); // Also simplified the dependency array
+}, [userInfo]);
 
 const dispatch = useDispatch();
 

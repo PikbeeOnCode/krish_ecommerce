@@ -25,7 +25,7 @@ const Navigation = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const [logoutApiCall] = useLogoutMutation(); // ✅ Correct hook for logout
+  const [logoutApiCall] = useLogoutMutation();
 
   const toggleDropDown = () => {
     setDropdownOpen(!dropdownOpen);
@@ -56,7 +56,6 @@ const Navigation = () => {
         xl:flex lg:flex md:hidden sm:hidden flex-col justify-between p-4
         text-white bg-black w-[4%] hover:w-[15%] h-[100vh] fixed`}
     >
-      {/* ----------- Navigation Links ----------- */}
       <div className="flex flex-col justify-center space-y-4">
       <Link
         to="/"
@@ -110,7 +109,6 @@ const Navigation = () => {
       </Link>
     </div>
 
-      {/* ----------- User Section ----------- */}
       <div className="relative">
         <button
           onClick={toggleDropDown}
@@ -192,7 +190,6 @@ const Navigation = () => {
         </>
       ) : null}
 
-      {/* Common for both admin and non-admin */}
       <li>
         <Link
           to="/profile"
@@ -214,7 +211,6 @@ const Navigation = () => {
 
       </div>
 
-      {/* ----------- Auth Links ----------- */}
       {!userInfo && (
         <ul>
           <li>

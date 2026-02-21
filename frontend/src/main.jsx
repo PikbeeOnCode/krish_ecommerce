@@ -8,24 +8,20 @@ import { Provider } from 'react-redux'
 import store from './redux/features/store.js';
 import Profile from './pages/User/Profile.jsx';
 
-// navigation
 import Home from './pages/Home.jsx'
 import Favorites from './pages/Products/Favourites.jsx'
 import ProductDetails from './pages/Products/ProductDetails.jsx'
 import Cart from './pages/Cart.jsx'
 import Shop from './pages/Shop.jsx'
 import UserOrder from './pages/User/UserOrder.jsx'
-// private route
 import PrivateRoutes from './components/PrivateRoutes.jsx'
 import Shipping from './pages/orders/Shipping.jsx'
 import PlaceOrder from './pages/orders/PlaceOrder.jsx'
 import Order from './pages/orders/Order.jsx'
 
-//  auth
 import Login from './pages/Auth/Login.jsx';
 import Register from './pages/Auth/Register.jsx'
 
-// admin Route
 import AdminRoutes from './pages/Admin/AdminRoutes.jsx'
 import UserList from './pages/Admin/UserList.jsx'
 import CategoryList from './pages/Admin/Categorylist.jsx'
@@ -58,7 +54,6 @@ const router = createBrowserRouter(
       <Route path='/placeorder' element={<PlaceOrder />} />
       <Route path='/order/:id' element={<Order />} />
     </Route>
-   {/* admin route */}
    <Route path='/admin'element={<AdminRoutes />}>
       <Route path='userlist' element={<UserList />} />
       <Route path='categorylist' element={<CategoryList />} />

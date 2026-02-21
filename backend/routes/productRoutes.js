@@ -2,14 +2,8 @@ import express from "express";
 import multer from "multer";
 const router = express.Router();
 
-
-// authentication
 import { authenticate, authorizationAdmin } from "../middleware/authMiddleware.js";
-
-// middleware
 import checkId from "../middleware/checkId.js";
-
-// controllers
 import {
 addProduct,
 updateProductDetails,

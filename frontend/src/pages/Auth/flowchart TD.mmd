@@ -1,0 +1,17 @@
+flowchart TD
+    Start([Customer Visits Store]) --> Login{Logged In?}
+    Login -->|No| Register[Register or Login]
+    Login -->|Yes| Browse[Browse Products]
+    Register --> Browse
+    Browse --> ViewProduct[View Product Details]
+    ViewProduct --> AddCart{Add to Cart?}
+    AddCart -->|Yes| Cart[Shopping Cart]
+    AddCart -->|No| Browse
+    Cart --> Checkout{Proceed to Checkout?}
+    Checkout -->|No| Browse
+    Checkout -->|Yes| Shipping[Enter Shipping Address]
+    Shipping --> Payment[Process Payment]
+    Payment --> Success{Payment Success?}
+    Success -->|No| Payment
+    Success -->|Yes| OrderConfirm[Order Confirmation]
+    OrderConfirm --> End([Order Complete])

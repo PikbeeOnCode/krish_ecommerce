@@ -20,7 +20,6 @@ const ProductCard = ({ p }) => {
   return (
     <div className="w-[18rem] relative bg-[#1A1A1A] rounded-2xl overflow-hidden shadow-lg hover:shadow-pink-500/20 hover:scale-[1.02] transition-all duration-300">
 
-      {/* Image Section */}
       <section className="relative">
         <Link to={`/product/${p._id}`}>
           <img
@@ -35,22 +34,18 @@ const ProductCard = ({ p }) => {
         </div>
       </section>
 
-      {/* Content Section */}
       <div className="p-4">
 
-        {/* Title */}
         <Link to={`/product/${p._id}`}>
           <h5 className="text-white font-semibold text-lg mb-1 hover:text-pink-400 transition-colors line-clamp-1">
             {p?.title}
           </h5>
         </Link>
 
-        {/* Published Date */}
         <p className="text-gray-400 text-sm mb-3">
           {moment(p?.publishedDate).format("MMM DD, YYYY")}
         </p>
 
-        {/* Price and Cart */}
         <div className="flex justify-between items-center">
           <p className="font-bold text-pink-500 text-xl">
             ${p?.price}

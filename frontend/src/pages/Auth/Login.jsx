@@ -46,7 +46,6 @@ const Login = () => {
 
           <form  onSubmit={submitHandler} className='container w-[35rem]'>
 
-            {/* email input */}
             <div className='my-[2rem]'>
               <label htmlFor="email" className='block text-sm font-medium text-black'>
                 Email Address  
@@ -60,7 +59,6 @@ const Login = () => {
                  />
             </div>
 
-            {/* password input */}
             <div className='my-[2rem]'>
               <label htmlFor="password" className='block text-sm font-medium text-black'>
                 Password

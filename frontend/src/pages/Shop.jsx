@@ -76,7 +76,6 @@ const Shop = () => {
       <div className="container mx-auto">
         <div className="flex md:flex-row ml-[5rem]">
 
-          {/* Sidebar Filters */}
           <div className="bg-[#151515] p-3 mt-2 mb-2 min-w-[16rem]">
             <h2 className="h4 text-center py-2 bg-black rounded-full mb-2">
               Filter by Categories
@@ -151,7 +150,6 @@ const Shop = () => {
             </div>
           </div>
 
-          {/* Products Grid */}
           <div className="p-3 ml-[2rem] flex-1">
             <h2 className="h4 text-center mb-4 text-lg font-semibold">
               {products?.length} Products

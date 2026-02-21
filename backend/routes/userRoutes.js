@@ -24,8 +24,6 @@ const router = express.Router();
  .get(authenticate,getCurrentUserProfile)
  .put(authenticate,updateCurrentUserProfile)
 
-//  admin routes
-
  router
  .route("/:id")
  .delete(authenticate,authorizationAdmin,deleteById)

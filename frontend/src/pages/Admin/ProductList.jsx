@@ -127,7 +127,7 @@ const ProductList = () => {
                 value={category}
                 onChange={(e) => setcategory(e.target.value)}
               >
-                <option value="">Choose Category</option> {/*  ADD DEFAULT OPTION */}
+                <option value="">Choose Category</option>
                 {categories?.map((c) => (
                   <option key={c._id} value={c._id}>
                     {c.name}

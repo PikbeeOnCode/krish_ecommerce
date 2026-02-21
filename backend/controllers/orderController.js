@@ -1,23 +1,11 @@
-import Order from "../models/orderModel.js";
-import Product from "../models/ProductModel.js";
+import { supabase } from "../config/supabaseClient.js";
 
-// Utility Function
 function calcPrices(orderItems) {
-  const itemsPrice = orderItems.reduce(
-    (acc, item) => acc + item.price * item.qty,
-    0
-  );
-
+  const itemsPrice = orderItems.reduce((acc, item) => acc + item.price * item.qty, 0);
   const shippingPrice = itemsPrice > 100 ? 0 : 10;
   const taxRate = 0.15;
-
   const taxPrice = (itemsPrice * taxRate).toFixed(2);
-
-  const totalPrice = (
-    itemsPrice +
-    shippingPrice +
-    parseFloat(taxPrice)
-  ).toFixed(2);
+  const totalPrice = (itemsPrice + shippingPrice + parseFloat(taxPrice)).toFixed(2);
 
   return {
     itemsPrice: itemsPrice.toFixed(2),
@@ -27,136 +15,150 @@ function calcPrices(orderItems) {
   };
 }
 
-// CREATE ORDER
 const createOrder = async (req, res) => {
   try {
     const { orderItems, shippingAddress, paymentMethod } = req.body;
 
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized, no user found");
-    }
+    if (!req.user) return res.status(401).json({ message: "Not authorized, no user found" });
+    if (!orderItems || orderItems.length === 0) return res.status(400).json({ message: "No order items" });
 
-    if (!orderItems || orderItems.length === 0) {
-      res.status(400);
-      throw new Error("No order items");
-    }
+    // fetch products from supabase
+    const productIds = orderItems.map((x) => x._id);
+    const { data: itemsFromDB, error: productError } = await supabase
+      .from("products")
+      .select("*")
+      .in("id", productIds);
 
-    const itemsFromDB = await Product.find({
-      _id: { $in: orderItems.map((x) => x._id) },
-    });
+    if (productError) throw productError;
 
     const dbOrderItems = orderItems.map((itemFromClient) => {
-      const matchingItemFromDB = itemsFromDB.find(
-        (itemFromDB) =>
-          itemFromDB._id.toString() === itemFromClient._id.toString()
-      );
-
-      if (!matchingItemFromDB) {
-        res.status(404);
-        throw new Error(`Product not found: ${itemFromClient._id}`);
-      }
+      const matchingItem = itemsFromDB.find((p) => p.id === itemFromClient._id);
+      if (!matchingItem) throw new Error(`Product not found: ${itemFromClient._id}`);
 
       return {
-        ...itemFromClient,
-        product: itemFromClient._id,
-        price: matchingItemFromDB.price,
-        title: matchingItemFromDB.title,
-        coverImage: matchingItemFromDB.coverImage,
-        _id: undefined,
+        product_id: matchingItem.id,
+        title: matchingItem.title,
+        cover_image: matchingItem.cover_image,
+        price: matchingItem.price,
+        qty: itemFromClient.qty,
       };
     });
 
-    const { itemsPrice, taxPrice, shippingPrice, totalPrice } =
-      calcPrices(dbOrderItems);
+    const { itemsPrice, taxPrice, shippingPrice, totalPrice } = calcPrices(dbOrderItems);
 
-    const order = new Order({
-      orderItems: dbOrderItems,
-      user: req.user._id,
-      shippingAddress,
-      paymentMethod,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
-      totalPrice,
-    });
+    // create order
+    const { data: createdOrder, error: orderError } = await supabase
+      .from("orders")
+      .insert([{
+        user_id: req.user._id,
+        shipping_address: shippingAddress,
+        payment_method: paymentMethod,
+        items_price: itemsPrice,
+        tax_price: taxPrice,
+        shipping_price: shippingPrice,
+        total_price: totalPrice,
+      }])
+      .select()
+      .single();
 
-    const createdOrder = await order.save();
-    res.status(201).json(createdOrder);
+    if (orderError) throw orderError;
+
+    // insert order items
+    const orderItemsToInsert = dbOrderItems.map((item) => ({
+      ...item,
+      order_id: createdOrder.id,
+    }));
+
+    const { error: itemsError } = await supabase.from("order_items").insert(orderItemsToInsert);
+    if (itemsError) throw itemsError;
+
+    // fetch complete order with items
+    const { data: fullOrder } = await supabase
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("id", createdOrder.id)
+      .single();
+
+    res.status(201).json(fullOrder);
   } catch (error) {
-    res.status(res.statusCode === 200 ? 500 : res.statusCode);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// GET ALL ORDERS (ADMIN)
 const getAllOrders = async (req, res) => {
   try {
-    const orders = await Order.find({}).populate("user", "id username");
-    res.json(orders);
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, users(id, username)");
+
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// GET LOGGED IN USER ORDERS
 const getUserOrders = async (req, res) => {
   try {
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
-    }
+    if (!req.user) return res.status(401).json({ message: "Not authorized" });
 
-    const orders = await Order.find({ user: req.user._id });
-    res.json(orders);
-  } catch (error) {
-    res.status(res.statusCode === 200 ? 500 : res.statusCode);
-    res.json({ message: error.message });
-  }
-};
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, order_items(*)")
+      .eq("user_id", req.user._id);
 
-// COUNT TOTAL ORDERS
-const countTotalOrders = async (req, res) => {
-  try {
-    const totalOrders = await Order.countDocuments();
-    res.json({ totalOrders });
+    if (error) throw error;
+    res.json(data);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// TOTAL SALES
+const countTotalOrders = async (req, res) => {
+  try {
+    const { count, error } = await supabase
+      .from("orders")
+      .select("*", { count: "exact", head: true });
+
+    if (error) throw error;
+    res.json({ totalOrders: count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 const calculateTotalSales = async (req, res) => {
   try {
-    const orders = await Order.find();
+    const { data, error } = await supabase.from("orders").select("total_price");
+    if (error) throw error;
 
-    const totalSales = orders.reduce(
-      (sum, order) => sum + Number(order.totalPrice),
-      0
-    );
-
+    const totalSales = data.reduce((sum, order) => sum + Number(order.total_price), 0);
     res.json({ totalSales });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
 
-// TOTAL SALES BY DATE
 const calculateTotalSalesByDate = async (req, res) => {
   try {
-    const salesByDate = await Order.aggregate([
-      {
-        $match: { isPaid: true },
-      },
-      {
-        $group: {
-          _id: {
-            $dateToString: { format: "%Y-%m-%d", date: "$paidAt" },
-          },
-          totalSales: { $sum: "$totalPrice" },
-        },
-      },
-    ]);
+    const { data, error } = await supabase
+      .from("orders")
+      .select("paid_at, total_price")
+      .eq("is_paid", true);
+
+    if (error) throw error;
+
+    // group by date manually
+    const salesByDate = data.reduce((acc, order) => {
+      const date = new Date(order.paid_at).toISOString().split("T")[0];
+      const existing = acc.find((x) => x._id === date);
+      if (existing) {
+        existing.totalSales += Number(order.total_price);
+      } else {
+        acc.push({ _id: date, totalSales: Number(order.total_price) });
+      }
+      return acc;
+    }, []);
 
     res.json(salesByDate);
   } catch (error) {
@@ -164,77 +166,69 @@ const calculateTotalSalesByDate = async (req, res) => {
   }
 };
 
-// FIND ORDER BY ID
 const findOrderById = async (req, res) => {
   try {
-    if (!req.user) {
-      res.status(401);
-      throw new Error("Not authorized");
-    }
+    if (!req.user) return res.status(401).json({ message: "Not authorized" });
 
-    const order = await Order.findById(req.params.id).populate(
-      "user",
-      "username email"
-    );
+    const { data, error } = await supabase
+      .from("orders")
+      .select("*, order_items(*), users(username, email)")
+      .eq("id", req.params.id)
+      .single();
 
-    if (!order) {
-      res.status(404);
-      throw new Error("Order not found");
-    }
+    if (error || !data) return res.status(404).json({ message: "Order not found" });
 
-    res.json(order);
+    res.json(data);
   } catch (error) {
-    res.status(res.statusCode === 200 ? 500 : res.statusCode);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// MARK ORDER AS PAID
 const markOrderAsPaid = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const { data, error } = await supabase
+      .from("orders")
+      .update({
+        is_paid: true,
+        paid_at: new Date(),
+        payment_result: {
+          id: req.body.id,
+          status: req.body.status,
+          update_time: req.body.update_time,
+          email_address: req.body.payer?.email_address,
+        },
+        updated_at: new Date(),
+      })
+      .eq("id", req.params.id)
+      .select()
+      .single();
 
-    if (!order) {
-      res.status(404);
-      throw new Error("Order not found");
-    }
+    if (error || !data) return res.status(404).json({ message: "Order not found" });
 
-    order.isPaid = true;
-    order.paidAt = Date.now();
-
-    order.paymentResult = {
-      id: req.body.id,
-      status: req.body.status,
-      update_time: req.body.update_time,
-      email_address: req.body.payer?.email_address,
-    };
-
-    const updatedOrder = await order.save();
-    res.status(200).json(updatedOrder);
+    res.status(200).json(data);
   } catch (error) {
-    res.status(res.statusCode === 200 ? 500 : res.statusCode);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 
-// MARK ORDER AS DELIVERED
 const markOrderAsDelivered = async (req, res) => {
   try {
-    const order = await Order.findById(req.params.id);
+    const { data, error } = await supabase
+      .from("orders")
+      .update({
+        is_delivered: true,
+        delivered_at: new Date(),
+        updated_at: new Date(),
+      })
+      .eq("id", req.params.id)
+      .select()
+      .single();
 
-    if (!order) {
-      res.status(404);
-      throw new Error("Order not found");
-    }
+    if (error || !data) return res.status(404).json({ message: "Order not found" });
 
-    order.isDelivered = true;
-    order.deliveredAt = Date.now();
-
-    const updatedOrder = await order.save();
-    res.json(updatedOrder);
+    res.json(data);
   } catch (error) {
-    res.status(res.statusCode === 200 ? 500 : res.statusCode);
-    res.json({ message: error.message });
+    res.status(500).json({ message: error.message });
   }
 };
 

@@ -102,10 +102,10 @@ export const productApiSlice = apiSlice.injectEndpoints({
                 method: "POST",
                 body: { checked, radio },
             }),
-            providesTags: ['Products'], // ← was missing
+            providesTags: ['Products'],
         }),
-    }) // ← closes endpoints
-}) // ← closes injectEndpoints
+    })
+})
 
 export const {
     useGetProductsQuery,
@@ -119,5 +119,5 @@ export const {
     useGetnewCategoriesQuery,
     useGetProductsDetailQuery,
     useUploadProductImageMutation,
-    useGetFilteredProductsQuery, // ← was missing
+    useGetFilteredProductsQuery,
 } = productApiSlice

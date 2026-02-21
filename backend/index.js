@@ -1,14 +1,11 @@
 import dotenv from "dotenv";
-dotenv.config(); // must be before everything else!
+dotenv.config();
 
-// packages
 import express from "express";
 import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
 
-// utilities
-import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
@@ -16,8 +13,6 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 
 const PORT = process.env.PORT || 3000;
-
-connectDB();
 
 const app = express();
 
@@ -46,3 +41,14 @@ app.use('/uploads', express.static(path.join(__dirname, '/uploads')));
 app.listen(PORT, () => {
   console.log("Port 3000 is listening!");
 });
+```
+
+Now also delete your `config/db.js` file since you don't need it anymore — Supabase handles the connection automatically when you use the client.
+
+Your `.env` should now look like this:
+```
+PORT=3000
+JWT_SECRET=your_jwt_secret
+SUPABASE_URL=your_supabase_url
+SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
+PAYPAL_CLIENT_ID=your_paypal_client_id

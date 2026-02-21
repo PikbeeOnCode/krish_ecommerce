@@ -46,7 +46,7 @@ const submitHandler = async (e) => {
     setRating(0);
     setComment("");
   } catch (error) {
-    toast.error(error?.data?.message || error?.message || "Something went wrong"); // ← fix here
+    toast.error(error?.data?.message || error?.message || "Something went wrong");
   }
 };
 

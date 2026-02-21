@@ -31,8 +31,6 @@ const Register = () => {
     }
     },[navigate,redirect,userInfo]);
 
-    // submit handler 
-
     const submithandler =async(e)=>{
         e.preventDefault();
         if(password !== confirmpassword){
@@ -56,7 +54,6 @@ const Register = () => {
         <form
         onSubmit={submithandler}
          className='container w-[35rem]' >
-            {/* user name input  */}
             <div className='my-[2rem]'>
                 <label
                  htmlFor="name"
@@ -69,7 +66,6 @@ const Register = () => {
                 value={userName}
                 onChange={e=> setUserName(e.target.value)} />
             </div>
-            {/* email input */}
                  <div className='my-[2rem]'>
                 <label
                  htmlFor="email"
@@ -82,7 +78,6 @@ const Register = () => {
                 value={email}
                 onChange={e=> setEmail(e.target.value)} />
             </div>
-            {/* password input */}
                  <div className='my-[2rem]'>
                 <label
                  htmlFor="password"
@@ -96,7 +91,6 @@ const Register = () => {
                 onChange={e=> setPassword(e.target.value)} />
             </div>
 
-{/* confirm password input  */}
                  <div className='my-[2rem]'>
                 <label
                  htmlFor="confirmPassword"
@@ -110,7 +104,6 @@ const Register = () => {
                 onChange={e=> setConfirmPassword(e.target.value)} />
             </div>
 
-    {/* register button */}
     <button 
     disabled={isloading}
     type='submit'
