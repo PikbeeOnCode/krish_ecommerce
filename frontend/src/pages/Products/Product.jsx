@@ -22,7 +22,7 @@ const Product = ({ product }) => {
         
         {/* Price Badge */}
         <div className="absolute top-3 right-3 bg-black/70 backdrop-blur-sm text-white text-sm font-bold px-3 py-1.5 rounded-full">
-          ${product.price}
+          Rs {product.price}
         </div>
       </div>
 

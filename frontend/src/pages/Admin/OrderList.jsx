@@ -72,7 +72,7 @@ const OrderList = () => {
 
                         <td className="px-4 py-3">
                           <span className="text-sm font-semibold text-pink-500">
-                            ${order.totalPrice || 0}
+                            Rs {order.totalPrice || 0}
                           </span>
                         </td>
 

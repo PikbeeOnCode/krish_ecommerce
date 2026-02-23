@@ -39,7 +39,7 @@ const SmallProducts = ({ product }) => {
           {/* Price */}
           <div className="flex justify-center">
             <span className="text-pink-500 text-xl font-bold">
-              ${product.price}
+              Rs {product.price}
             </span>
           </div>
         </div>

@@ -6,30 +6,33 @@ import createToken from "../utils/createtoken.js"
 const createUser = asyncHandler(async (req, res) => {
   let { username, email, password } = req.body;
 
-  // trim whitespace
   username = username?.trim();
   email = email?.trim().toLowerCase();
 
-  // check required fields
   if (!username || !email || !password) {
     res.status(400);
     throw new Error("Fill all the inputs");
   }
 
-  // validate email format
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     res.status(400);
     throw new Error("Invalid email format");
   }
 
-  // check password length
+  // allowed email domains
+  const allowedDomains = ["gmail.com", "yahoo.com", "email.com", "outlook.com", "hotmail.com", "icloud.com"];
+  const emailDomain = email.split("@")[1];
+  if (!allowedDomains.includes(emailDomain)) {
+    res.status(400);
+    throw new Error("Please use a valid email provider (Gmail, Yahoo, Outlook, Hotmail, iCloud)");
+  }
+
   if (password.length < 8) {
     res.status(400);
     throw new Error("Password must be at least 8 characters");
   }
 
-  // check if user exists
   const userExist = await User.findOne({ email });
   if (userExist) {
     return res.status(400).send("User email is already registered :)");
