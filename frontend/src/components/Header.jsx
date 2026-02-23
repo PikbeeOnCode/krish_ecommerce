@@ -3,7 +3,7 @@ import { useGetTopProductsQuery } from '../redux/api/productApiSlice'
 import Loader from './Loader';
 import SmallProducts from '../pages/Products/SmallProducts';
 import ProductCarousel from '../pages/Products/ProductCarousel';
-import Product from '../../../backend/models/ProductModel';
+
 
 
 const Header = () => {

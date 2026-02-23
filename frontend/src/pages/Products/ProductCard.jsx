@@ -48,7 +48,7 @@ const ProductCard = ({ p }) => {
 
         <div className="flex justify-between items-center">
           <p className="font-bold text-pink-500 text-xl">
-            ${p?.price}
+            Rs{p?.price}
           </p>
 
           <button

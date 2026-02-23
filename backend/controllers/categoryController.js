@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabaseClient.js";
+import { supabase, formatId } from "../config/supabaseClient.js";
 import asyncHandler from "express-async-handler";
 
 const createCategory = asyncHandler(async (req, res) => {
@@ -26,7 +26,7 @@ const createCategory = asyncHandler(async (req, res) => {
       .single();
 
     if (error) throw error;
-    return res.status(201).json(data);
+    return res.status(201).json(formatId(data));
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server Error" });
@@ -49,7 +49,7 @@ const updateCategory = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    return res.status(200).json(data);
+    return res.status(200).json(formatId(data));
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server Error" });
@@ -86,7 +86,7 @@ const listCategories = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "No categories found" });
     }
 
-    return res.status(200).json(data);
+    return res.status(200).json(formatId(data));
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server Error" });
@@ -105,7 +105,7 @@ const readCategory = asyncHandler(async (req, res) => {
       return res.status(404).json({ message: "Category not found" });
     }
 
-    return res.status(200).json(data);
+    return res.status(200).json(formatId(data));
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Server Error" });

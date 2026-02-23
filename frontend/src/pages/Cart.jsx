@@ -51,7 +51,7 @@ const Cart = () => {
 
                     <div className="mt-2 text-white">{item.author}</div>
                     <div className="mt-2 text-white font-bold">
-                      $ {item.price}
+                      Rs {item.price}
                     </div>
                   </div>
 

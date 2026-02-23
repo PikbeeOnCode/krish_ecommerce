@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -12,12 +11,9 @@ const Shipping = () => {
   const cart = useSelector((state) => state.cart);
   const { shippingAddress } = cart;
 
-  const [paymentMethod, setPaymentMethod] = useState("PayPal");
   const [address, setAddress] = useState(shippingAddress.address || "");
   const [city, setCity] = useState(shippingAddress.city || "");
-  const [postalCode, setPostalCode] = useState(
-    shippingAddress.postalCode || ""
-  );
+  const [postalCode, setPostalCode] = useState(shippingAddress.postalCode || "");
   const [country, setCountry] = useState(shippingAddress.country || "");
 
   const dispatch = useDispatch();
@@ -25,9 +21,8 @@ const Shipping = () => {
 
   const submitHandler = (e) => {
     e.preventDefault();
-
     dispatch(saveShippingAddress({ address, city, postalCode, country }));
-    dispatch(savePaymentMethod(paymentMethod));
+    dispatch(savePaymentMethod("Cash on Delivery"));
     navigate("/placeorder");
   };
 
@@ -87,22 +82,11 @@ const Shipping = () => {
               onChange={(e) => setCountry(e.target.value)}
             />
           </div>
-          <div className="mb-4">
-            <label className="block text-gray-400">Select Method</label>
-            <div className="mt-2">
-              <label className="inline-flex items-center">
-                <input
-                  type="radio"
-                  className="form-radio text-pink-500"
-                  name="paymentMethod"
-                  value="PayPal"
-                  checked={paymentMethod === "PayPal"}
-                  onChange={(e) => setPaymentMethod(e.target.value)}
-                />
 
-                <span className="ml-2">PayPal or Credit Card</span>
-              </label>
-            </div>
+          {/* COD notice */}
+          <div className="mb-4 p-3 bg-[#181818] rounded">
+            <p className="text-gray-400">Payment Method</p>
+            <p className="text-white font-semibold mt-1">💵 Cash on Delivery</p>
           </div>
 
           <button

@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabaseClient.js";
+import { supabase, formatId } from "../config/supabaseClient.js";
 import bcrypt from "bcrypt";
 import asyncHandler from "../middleware/asyncHandler.js";
 import createToken from "../utils/createtoken.js";
@@ -100,7 +100,7 @@ const logoutCurrentUser = asyncHandler(async (req, res) => {
 const getAllUsers = asyncHandler(async (req, res) => {
   const { data: users, error } = await supabase.from("users").select("*");
   if (error) throw error;
-  res.json(users);
+  res.json(formatId(users));
 });
 
 const getCurrentUserProfile = asyncHandler(async (req, res) => {
@@ -189,7 +189,7 @@ const getUserById = asyncHandler(async (req, res) => {
     .single();
 
   if (user) {
-    res.json(user);
+    res.json(formatId(user));
   } else {
     res.status(404);
     throw new Error("User not found");

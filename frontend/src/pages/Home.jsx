@@ -1,5 +1,5 @@
 import React from 'react'
-import { useParams,Link } from 'react-router'
+import { useParams, Link } from 'react-router'
 import { useGetProductsQuery } from '../redux/api/productApiSlice'
 import Header from '../components/Header'
 import Loader from '../components/Loader'
@@ -17,7 +17,7 @@ const Home = () => {
         <Loader />
       ) : isError ? (
         <Message variant="danger">
-          {isError?.data.message || isError.error}
+          {isError?.data?.message || isError?.error || "Something went wrong"}
         </Message>
       ) : (
         <>
@@ -36,7 +36,7 @@ const Home = () => {
 
           <div>
             <div className="flex justify-center flex-wrap mt-[2rem]">
-              {data.products.map((product) => (
+              {data?.products?.map((product) => (
                 <div key={product._id}>
                   <Product product={product} />
                 </div>

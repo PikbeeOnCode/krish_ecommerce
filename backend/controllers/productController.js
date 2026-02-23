@@ -1,4 +1,4 @@
-import { supabase } from "../config/supabaseClient.js";
+import { supabase, formatProduct } from "../config/supabaseClient.js";
 import asyncHandler from "../middleware/asyncHandler.js";
 
 const addProduct = asyncHandler(async (req, res) => {
@@ -36,7 +36,7 @@ const addProduct = asyncHandler(async (req, res) => {
       .single();
 
     if (error) throw error;
-    res.status(201).json({ message: "Product added successfully", product: data });
+    res.status(201).json({ message: "Product added successfully", product: formatProduct(data) });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
@@ -72,7 +72,7 @@ const updateProductDetails = asyncHandler(async (req, res) => {
 
     if (error || !data) return res.status(404).json({ message: "Product not found" });
 
-    res.json(data);
+    res.json(formatProduct(data));
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });
@@ -122,7 +122,7 @@ const fetchProducts = asyncHandler(async (req, res) => {
   const totalPages = Math.ceil(count / limit);
 
   res.status(200).json({
-    products: data,
+    products: formatProduct(data),
     currentPage: page,
     totalPages,
     totalProducts: count,
@@ -140,7 +140,7 @@ const fetchProductById = asyncHandler(async (req, res) => {
 
   if (error || !data) return res.status(404).json({ message: "Product not found" });
 
-  res.status(200).json(data);
+  res.status(200).json(formatProduct(data));
 });
 
 const fetchAllProducts = asyncHandler(async (req, res) => {
@@ -156,13 +156,12 @@ const fetchAllProducts = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "No products found" });
   }
 
-  res.status(200).json(data);
+  res.status(200).json(formatProduct(data));
 });
 
 const addProductReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
 
-  // check if product exists
   const { data: product, error: productError } = await supabase
     .from("products")
     .select("*, reviews(*)")
@@ -173,7 +172,6 @@ const addProductReview = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Product not found" });
   }
 
-  // check if already reviewed
   const { data: existingReview } = await supabase
     .from("reviews")
     .select("*")
@@ -185,7 +183,6 @@ const addProductReview = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "Product already reviewed" });
   }
 
-  // add review
   const { error: reviewError } = await supabase.from("reviews").insert([{
     product_id: req.params.id,
     user_id: req.user._id,
@@ -196,7 +193,6 @@ const addProductReview = asyncHandler(async (req, res) => {
 
   if (reviewError) throw reviewError;
 
-  // update ratings and numReviews on product
   const { data: allReviews } = await supabase
     .from("reviews")
     .select("rating")
@@ -223,7 +219,7 @@ const fetchTopProducts = asyncHandler(async (req, res) => {
   if (error) throw error;
   if (!data || data.length === 0) return res.status(404).json({ message: "No products found" });
 
-  res.json(data);
+  res.json(formatProduct(data));
 });
 
 const fetchNewProducts = asyncHandler(async (req, res) => {
@@ -236,7 +232,7 @@ const fetchNewProducts = asyncHandler(async (req, res) => {
   if (error) throw error;
   if (!data || data.length === 0) return res.status(404).json({ message: "No products found" });
 
-  res.json(data);
+  res.json(formatProduct(data));
 });
 
 const filterProducts = asyncHandler(async (req, res) => {
@@ -256,7 +252,7 @@ const filterProducts = asyncHandler(async (req, res) => {
     const { data, error } = await query;
     if (error) throw error;
 
-    res.json(data);
+    res.json(formatProduct(data));
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Server Error" });

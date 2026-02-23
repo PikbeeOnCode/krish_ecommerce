@@ -10,16 +10,14 @@ import { clearCartItems } from "../../redux/features/cart/cartSlice";
 
 const PlaceOrder = () => {
   const navigate = useNavigate();
-
   const cart = useSelector((state) => state.cart);
-
   const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
   useEffect(() => {
     if (!cart.shippingAddress.address) {
       navigate("/shipping");
     }
-  }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
+  }, [cart.shippingAddress.address, navigate]);
 
   const dispatch = useDispatch();
 
@@ -29,7 +27,7 @@ const PlaceOrder = () => {
       const res = await createOrder({
         orderItems: cart.cartItems,
         shippingAddress: cart.shippingAddress,
-        paymentMethod: cart.paymentMethod,
+        paymentMethod: "Cash on Delivery",
         itemsPrice: cart.itemsPrice,
         shippingPrice: cart.shippingPrice,
         taxPrice: cart.taxPrice,
@@ -72,14 +70,13 @@ const PlaceOrder = () => {
                         className="w-16 h-16 object-cover"
                       />
                     </td>
-
                     <td className="p-2">
                       <Link to={`/product/${item._id}`}>{item.title}</Link>
                     </td>
                     <td className="p-2">{item.qty}</td>
                     <td className="p-2">{item.price.toFixed(2)}</td>
                     <td className="p-2">
-                      $ {(item.qty * item.price).toFixed(2)}
+                      Rs {(item.qty * item.price).toFixed(2)}
                     </td>
                   </tr>
                 ))}
@@ -93,20 +90,16 @@ const PlaceOrder = () => {
           <div className="flex justify-between flex-wrap p-8 bg-[#181818]">
             <ul className="text-lg">
               <li>
-                <span className="font-semibold mb-4">Items:</span> $
-                {cart.itemsPrice}
+                <span className="font-semibold mb-4">Items:</span> Rs {cart.itemsPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Shipping:</span> $
-                {cart.shippingPrice}
+                <span className="font-semibold mb-4">Shipping:</span> Rs {cart.shippingPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Tax:</span> $
-                {cart.taxPrice}
+                <span className="font-semibold mb-4">Tax:</span> Rs {cart.taxPrice}
               </li>
               <li>
-                <span className="font-semibold mb-4">Total:</span> $
-                {cart.totalPrice}
+                <span className="font-semibold mb-4">Total:</span> Rs {cart.totalPrice}
               </li>
             </ul>
 
@@ -127,7 +120,7 @@ const PlaceOrder = () => {
 
             <div>
               <h2 className="text-2xl font-semibold mb-4">Payment Method</h2>
-              <strong>Method:</strong> {cart.paymentMethod}
+              <strong>Method:</strong> Cash on Delivery
             </div>
           </div>
 

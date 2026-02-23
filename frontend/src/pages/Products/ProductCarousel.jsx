@@ -60,7 +60,7 @@ const ProductCarousel = () => {
                 <div className="mt-4 flex justify-between">
                   <div className="one">
                     <h2>{title}</h2>
-                    <p> $ {price}</p> <br /> <br />
+                    <p> Rs {price}</p> <br /> <br />
                     <p className="w-[25rem]">
                       {summary.substring(0, 170)} ...
                     </p>
